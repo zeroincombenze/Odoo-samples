@@ -21,7 +21,7 @@
 ##############################################################################
 """
 
-List Odoo databases  V1.00
+List Odoo databases  V1.01
 
 This code contains sample to access Odoo database
 
@@ -41,7 +41,7 @@ python driver -> No module are required; code can run inside Odoo application.
 
 xmlrpc -> Same as web service; no module are required; code can run inside Odoo application.
      Require more code than oerlib.
-     Call Odoo methos, so it is safe.
+     Call Odoo methods, so it is safe.
 
 
                                     oerplib        python driver     xmlrpc
@@ -58,30 +58,37 @@ Require Odoo server running         No             Yes               Yes
 """
 
 import pdb
+import ConfigParser
 
+#pdb.set_trace()
+# Get username and password form /etc/openerp-server.conf
+# This code may not work if db server is not in current host!!
+
+cfg_obj = ConfigParser.SafeConfigParser()
+cfg_obj.read("/etc/openerp-server.conf")
+s="options"
+db_user=cfg_obj.get(s, "db_user")
+db_passwd=cfg_obj.get(s, "db_password")
+db_host=cfg_obj.get(s, "db_host")
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 method = 3
-#Username and password are stored in separate sample file
-fd=open("sample_db_list.conf", 'r')
-uu=fd.readline().strip()
-pw=fd.readline().strip()
-fd.close()
 
 
 if method == 1:
     import oerplib
     
+
     oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
     print oerp.db.list()
     print "DB list by oerplib"
 
+
+
 elif method == 2:
     import psycopg2
 
-    db_user = uu
-    db_passwd = pw
-    db_host = "localhost"
+
     db_port = 5432
     db_name = "demo"
     db = psycopg2.connect(user=db_user, 
@@ -96,16 +103,15 @@ elif method == 2:
     print "DB list by psycopg2"
 
 
+
 elif method == 3:
     import xmlrpclib
 
-    user = uu
-    password = pw
-    host = "localhost:8069"
+
+    host = db_host+":8069"
     db = "postgres"
     db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
     sock = xmlrpclib.ServerProxy(db_serv_url)
-    #uid = sock.login(db, user, password)
     dblist = sock.list()
     print dblist
     print "DB list by xmlrpc"
