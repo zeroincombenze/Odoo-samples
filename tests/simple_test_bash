@@ -1,0 +1,30 @@
+#set -x
+cmd_2_exec="python sample_db_list.py"
+appout=""
+rmout=0
+cmd_test_validate="grep"
+cmd_test_args="-o \"demo.*,.*zeroincombenze\""
+#
+# Start test
+echo "Starting test"
+echo " exec $cmd_2_exec"
+if [ "$app_out" == "" ]
+then
+  appout="stdout.out"
+  rmout=1
+  $cmd_2_exec > $appout
+else
+  $cmd_2_exec
+fi
+echo "Exec validation"
+eval $cmd_test_validate $cmd_test_args $appout
+if [ $? -eq 0 ]
+then
+  echo "Test successfully ended"
+else
+  echo "Test Failed!!!!!"
+fi
+if [ "$rmout" -ne "0" ]
+then
+  rm -f $appout
+fi
