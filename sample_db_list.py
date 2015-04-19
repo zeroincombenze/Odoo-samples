@@ -34,42 +34,42 @@ oerplib -> Require oerlib python module (pip install oerplib).
      It is the most simple method. All code is encapsulated in library.
      oerplib is e LGPL licensed module.
 
-python driver -> No module are required; code can run inside Odoo application.
+python driver -> No module required; code can run inside Odoo application.
      May be dangerous because code access directly to database.
      Require a lot of code and database schema.
      It is possibile do anything, even suicide.
 
-xmlrpc -> Same as web service; no module are required; code can run inside Odoo application.
+xmlrpc -> Run in Odoo web side; no module required.
      Require more code than oerlib.
      Call Odoo methods, so it is safe.
 
 
-                                    oerplib        python driver     xmlrpc
-Require supplemental addons         Yes            No                No
-Programming complexity              Simple         Complex           Complex
-Odoo future version adaptability    Yes            No guarantee      Should be yes
-Source integration                  Low            High              High
-Safe                                Yes            No                Yes
-Can be evolved                      see oerlib     Yes, anything     just xmlrpc methods
-Server side                         Yes            Yes               Yes
-Web side                            ?              ?                 Yes
-Require Odoo server running         No             Yes               Yes
+                                    oerplib       python driver     xmlrpc
+Require supplemental addons         Yes           No                No
+Programming complexity              Simple        Complex           Complex
+Odoo future version adaptability    Yes           No guarantee      Yes
+Source integration                  Low           High              High
+Safe                                Yes           No                Yes
+Can be evolved                      see oerlib    Yes, anything     see xmlrpc
+Server side                         Yes           Yes               Yes
+Web side                            ?             ?                 Yes
+Require Odoo server running         No            Yes               Yes
 
 """
 
-import pdb
+# import pdb
 import ConfigParser
 
-#pdb.set_trace()
+# pdb.set_trace()
 # Get username and password form /etc/openerp-server.conf
 # This code may not work if db server is not in current host!!
 
 cfg_obj = ConfigParser.SafeConfigParser()
 cfg_obj.read("/etc/openerp-server.conf")
-s="options"
-db_user=cfg_obj.get(s, "db_user")
-db_passwd=cfg_obj.get(s, "db_password")
-db_host=cfg_obj.get(s, "db_host")
+s = "options"
+db_user = cfg_obj.get(s, "db_user")
+db_passwd = cfg_obj.get(s, "db_password")
+db_host = cfg_obj.get(s, "db_host")
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 method = 3
@@ -77,7 +77,7 @@ method = 3
 
 if method == 1:
     import oerplib
-    
+
 
     oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
     print oerp.db.list()
@@ -91,11 +91,12 @@ elif method == 2:
 
     db_port = 5432
     db_name = "demo"
-    db = psycopg2.connect(user=db_user, 
-                            password=db_passwd,
-                            host=    db_host,
-                            port=    db_port,
-                            database=db_name)
+    db = psycopg2.connect(
+        user=db_user,
+        password=db_passwd,
+        host=db_host,
+        port=db_port,
+        database=db_name)
     cr = db.cursor()
     cr.execute("select datname from pg_database")
     dblist = [str(name) for (name,) in cr.fetchall()]
@@ -115,7 +116,8 @@ elif method == 3:
     dblist = sock.list()
     print dblist
     print "DB list by xmlrpc"
- 
+
+
 
 else:
     raise "Invalid method. Use (1=oerplib, 2=psycopg2, 3=xmlrpclib)!"

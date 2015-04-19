@@ -1,25 +1,6 @@
-[![Build Status](https://travis-ci.org/OCA/maintainer-quality-tools.svg)](https://travis-ci.org/OCA/maintainer-quality-tools)
-[![Coverage Status](https://img.shields.io/coveralls/OCA/maintainers-tools.svg)](https://coveralls.io/r/OCA/maintainers-tools?branch=master)
+[![Build Status](https://travis-ci.org/OCA/${REPO_NAME}.svg?branch=${BRANCH_NAME})](https://travis-ci.org/OCA/${REPO_NAME})
+[![Coverage Status](https://coveralls.io/repos/OCA/${REPO_NAME}/badge.png?branch=${BRANCH_NAME})](https://coveralls.io/r/OCA/${REPO_NAME}?branch=${BRANCH_NAME})
 
+# ${REPO_NAME_VERBOSE}
 
-Odoo-samples
-============
-
-Odoo (formerly OpenERP) source code examples
---------------------------------------------
-
-Sparse Odoo source code
-
-
-
-History
--------
-
-Project started at March, 2015, currently working in progress.
-
-
-See also
---------
-
-http://www.zeroincombenze.org/wiki/Odoo
-
+${REPO_DESCRIPTION_AND_MODULE_LIST}
