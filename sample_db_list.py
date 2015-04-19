@@ -70,6 +70,7 @@ s = "options"
 db_user = cfg_obj.get(s, "db_user")
 db_passwd = cfg_obj.get(s, "db_password")
 db_host = cfg_obj.get(s, "db_host")
+version = "V1.0.0"
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 method = 3
@@ -78,11 +79,9 @@ method = 3
 if method == 1:
     import oerplib
 
-
     oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
     print oerp.db.list()
     print "DB list by oerplib"
-
 
 
 elif method == 2:
@@ -104,10 +103,8 @@ elif method == 2:
     print "DB list by psycopg2"
 
 
-
 elif method == 3:
     import xmlrpclib
-
 
     host = db_host+":8069"
     db = "postgres"
@@ -118,10 +115,8 @@ elif method == 3:
     print "DB list by xmlrpc"
 
 
-
 else:
     raise "Invalid method. Use (1=oerplib, 2=psycopg2, 3=xmlrpclib)!"
-
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
