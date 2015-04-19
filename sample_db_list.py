@@ -70,7 +70,7 @@ s = "options"
 db_user = cfg_obj.get(s, "db_user")
 db_passwd = cfg_obj.get(s, "db_password")
 db_host = cfg_obj.get(s, "db_host")
-version = "V1.0.0"
+version = "V1.0.1"
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 method = 3
@@ -86,7 +86,6 @@ if method == 1:
 
 elif method == 2:
     import psycopg2
-
 
     db_port = 5432
     db_name = "demo"
