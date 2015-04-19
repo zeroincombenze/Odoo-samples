@@ -21,7 +21,7 @@
 ##############################################################################
 """
 
-List Odoo databases  V1.01
+List Odoo databases  V1.0.2
 
 This code contains sample to access Odoo database
 
@@ -70,7 +70,7 @@ s = "options"
 db_user = cfg_obj.get(s, "db_user")
 db_passwd = cfg_obj.get(s, "db_password")
 db_host = cfg_obj.get(s, "db_host")
-version = "V1.0.1"
+version = "V1.0.2"
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 method = 3
@@ -80,8 +80,8 @@ if method == 1:
     import oerplib
 
     oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
-    print oerp.db.list()
-    print "DB list by oerplib"
+    # print oerp.db.list()
+    # print "DB list by oerplib"
 
 
 elif method == 2:
@@ -98,8 +98,8 @@ elif method == 2:
     cr = db.cursor()
     cr.execute("select datname from pg_database")
     dblist = [str(name) for (name,) in cr.fetchall()]
-    print dblist
-    print "DB list by psycopg2"
+    # print dblist
+    # print "DB list by psycopg2"
 
 
 elif method == 3:
@@ -110,8 +110,8 @@ elif method == 3:
     db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
     sock = xmlrpclib.ServerProxy(db_serv_url)
     dblist = sock.list()
-    print dblist
-    print "DB list by xmlrpc"
+    # print dblist
+    # print "DB list by xmlrpc"
 
 
 else:
