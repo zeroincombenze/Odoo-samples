@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/antoniov/Odoo-samples.svg)](https://travis-ci.org/antoniov/Odoo-samples)
-[![Coverage Status](https://coveralls.io/repos/antoniov/Odoo-samples/badge.png)](https://coveralls.io/r/antoniov/Odoo-samples)
+[![Coverage Status](https://coveralls.io/repos/antoniov/Odoo-samples/badge.svg)](https://coveralls.io/r/antoniov/Odoo-samples)
 
 
 Odoo-samples
