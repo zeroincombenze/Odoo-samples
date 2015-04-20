@@ -1,6 +1,11 @@
+# Config file .travis.yml
+
+sudo: required
 language: python
 
+
 python:
+  - "2.6"
   - "2.7"
 
 env:
