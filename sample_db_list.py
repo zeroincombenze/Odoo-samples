@@ -21,7 +21,7 @@
 ##############################################################################
 """
 
-List Odoo databases  V1.0.3
+List Odoo databases  V1.0.4
 
 This code contains sample to access Odoo database
 
@@ -70,7 +70,7 @@ s = "options"
 db_user = cfg_obj.get(s, "db_user")
 db_passwd = cfg_obj.get(s, "db_password")
 db_host = cfg_obj.get(s, "db_host")
-version = "V1.0.3"
+version = "V1.0.4"
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 for method in (1, 2, 3):
@@ -80,7 +80,6 @@ for method in (1, 2, 3):
 
         oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
         db_list_1 = oerp.db.list()
-
 
     elif method == 2:
         import psycopg2
@@ -100,8 +99,6 @@ for method in (1, 2, 3):
         dblist = [str(name) for (name,) in cr.fetchall()]
         db_list_2 = dblist
 
-
-
     elif method == 3:
         import xmlrpclib
 
@@ -111,7 +108,6 @@ for method in (1, 2, 3):
         sock = xmlrpclib.ServerProxy(db_serv_url)
         dblist = sock.list()
         db_list_3 = dblist
-
 
     else:
         raise "Invalid method. Use (1=oerplib, 2=psycopg2, 3=xmlrpclib)!"
