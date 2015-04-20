@@ -1,8 +1,8 @@
 # Config file .coveragerc
 
 #[report]
-#include =
-#    */OCA/l10n-switzerland/*
+include =
+    *.py
 
 omit =
     */tests/*

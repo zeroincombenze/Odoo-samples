@@ -21,7 +21,7 @@
 ##############################################################################
 """
 
-List Odoo databases  V1.0.2
+List Odoo databases  V1.0.3
 
 This code contains sample to access Odoo database
 
@@ -70,52 +70,65 @@ s = "options"
 db_user = cfg_obj.get(s, "db_user")
 db_passwd = cfg_obj.get(s, "db_password")
 db_host = cfg_obj.get(s, "db_host")
-version = "V1.0.2"
+version = "V1.0.3"
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
-method = 3
+for method in (1, 2, 3):
+
+    if method == 1:
+        import oerplib
+
+        oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
+        db_list_1 = oerp.db.list()
 
 
-if method == 1:
-    import oerplib
+    elif method == 2:
+        import psycopg2
 
-    oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
-    # print oerp.db.list()
-    # print "DB list by oerplib"
-
-
-elif method == 2:
-    import psycopg2
-
-    db_port = 5432
-    db_name = "demo"
-    db = psycopg2.connect(
-        user=db_user,
-        password=db_passwd,
-        host=db_host,
-        port=db_port,
-        database=db_name)
-    cr = db.cursor()
-    cr.execute("select datname from pg_database")
-    dblist = [str(name) for (name,) in cr.fetchall()]
-    # print dblist
-    # print "DB list by psycopg2"
+        db_port = 5432
+        db_name = "demo"
+        db = psycopg2.connect(
+            user=db_user,
+            password=db_passwd,
+            host=db_host,
+            port=db_port,
+            database=db_name)
+        cr = db.cursor()
+        cr.execute("select datname from pg_database"
+                   " where datname not like 'template%'"
+                   "  and datname not like 'postgres%'")
+        dblist = [str(name) for (name,) in cr.fetchall()]
+        db_list_2 = dblist
 
 
-elif method == 3:
-    import xmlrpclib
 
-    host = db_host+":8069"
-    db = "postgres"
-    db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
-    sock = xmlrpclib.ServerProxy(db_serv_url)
-    dblist = sock.list()
-    # print dblist
-    # print "DB list by xmlrpc"
+    elif method == 3:
+        import xmlrpclib
+
+        host = db_host+":8069"
+        db = "postgres"
+        db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
+        sock = xmlrpclib.ServerProxy(db_serv_url)
+        dblist = sock.list()
+        db_list_3 = dblist
 
 
-else:
-    raise "Invalid method. Use (1=oerplib, 2=psycopg2, 3=xmlrpclib)!"
+    else:
+        raise "Invalid method. Use (1=oerplib, 2=psycopg2, 3=xmlrpclib)!"
 
+# check for reults
+db_err = False
+for db in db_list_1:
+    if db not in db_list_2 or db not in db_list_3:
+        db_err = True
+for db in db_list_2:
+    if db not in db_list_1 or db not in db_list_3:
+        db_err = True
+for db in db_list_3:
+    if db not in db_list_1 or db not in db_list_2:
+        db_err = True
+
+if db_err:
+    raise "Test failed!"
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
