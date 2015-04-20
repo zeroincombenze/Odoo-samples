@@ -1,12 +1,15 @@
 # Config file .coveragerc
 
-#[report]
+
+[report]
 include =
     *.py
+
 
 omit =
     */tests/*
     *__init__.py
+
 
 # Regexes for lines to exclude from consideration
 exclude_lines =
