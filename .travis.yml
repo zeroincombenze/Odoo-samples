@@ -29,7 +29,7 @@ install:
 
 script:
   - travis_run_tests
-  - coverage run sample_db_list.py 
+#  - coverage run sample_db_list.py 
 
 
 after_success:
