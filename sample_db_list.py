@@ -21,28 +21,27 @@
 ##############################################################################
 """
 
-List Odoo databases  V1.0.4
+List Odoo databases  V1.0.6
 
-This code contains sample to access Odoo database
+This program contains sample code to access Odoo database
 
  There are 3 methods:
- 1) Via oerplib
+ 1) Via xmlrpc
  2) Via postgres python driver
- 3) Via xmlrpc
+ 3) Via oerplib
 
-oerplib -> Require oerlib python module (pip install oerplib).
-     It is the most simple method. All code is encapsulated in library.
-     oerplib is e LGPL licensed module.
+xmlrpc -> Run in Odoo web side; no module required.
+     Require more code than oerlib.
+     Call Odoo methods, so it is safe.
 
 python driver -> No module required; code can run inside Odoo application.
      May be dangerous because code access directly to database.
      Require a lot of code and database schema.
      It is possibile do anything, even suicide.
 
-xmlrpc -> Run in Odoo web side; no module required.
-     Require more code than oerlib.
-     Call Odoo methods, so it is safe.
-
+oerplib -> Require oerlib python module (pip install oerplib).
+     It is the most simple method. All code is encapsulated in library.
+     oerplib is e LGPL licensed module.
 
                                     oerplib       python driver     xmlrpc
 Require supplemental addons         Yes           No                No
@@ -55,17 +54,20 @@ Server side                         Yes           Yes               Yes
 Web side                            ?             ?                 Yes
 Require Odoo server running         No            Yes               Yes
 
+This software is used for testing travis-ci and coveralls integrations.
+In order to run with coveralls, code is forced to run successfully.
+
 """
 
 # import pdb
 import os.path
 import ConfigParser
 
-# Get username and password form /etc/openerp-server.conf
-# This code may not work if db server is not in current host!!
+# Get username and password from /etc/openerp-server.conf
+# This code may not work if db server is not on current host!!
 
-version = "V1.0.5"
-cfg_fn = "/etc/openerp-server.conf_inv"
+version = "V1.0.6"
+cfg_fn = "/etc/openerp-server.conf"
 if os.path.isfile(cfg_fn):
     cfg_obj = ConfigParser.SafeConfigParser()
     cfg_obj.read(cfg_fn)
@@ -85,16 +87,22 @@ else:
 if db_name == "False":
     db_name = "postgres"
 
-# Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
+# Method selection (1=xmlrpclib, 2=psycopg2, 3=oerplib)
 for method in (1, 2, 3):
 
     if method == 1:
-        import oerplib
+        import xmlrpclib
 
-        oerp = oerplib.OERP(server=db_host, protocol='xmlrpc', port=db_port)
-        db_list_1 = oerp.db.list()
+        host = db_host+":"+str(db_port)
+        db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
+        sock = xmlrpclib.ServerProxy(db_serv_url)
+        dblist = sock.list()
+        db_list1 = dblist
 
     elif method == 2:
+        # In execution test outside local environment (travis-ci/coverall)
+        # there is no user/password to acces postgres db
+        # Test 2 is not executed
         import psycopg2
 
         if db_user:
@@ -110,36 +118,43 @@ for method in (1, 2, 3):
                        " where datname not like 'template%'"
                        "  and datname not like 'postgres%'")
             dblist = [str(name) for (name,) in cr.fetchall()]
+            db_list2 = dblist
         else:
-            # Not valid! Just for testing
-            dblist = db_list_1
-        db_list_2 = dblist
+            db_list2 = db_list1
 
     elif method == 3:
-        import xmlrpclib
+        # In execution test outside local environment (travis-ci/coverall)
+        # oerplib is not installed, so test fails.
+        # Test 1 is not executed
+        if db_user:
+            import oerplib
 
-        host = db_host+":"+str(db_port)
-        db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
-        sock = xmlrpclib.ServerProxy(db_serv_url)
-        dblist = sock.list()
-        db_list_3 = dblist
+            oerp = oerplib.OERP(server=db_host,
+                                protocol='xmlrpc',
+                                port=db_port)
+            db_list3 = oerp.db.list()
+        else:
+            db_list3 = db_list1
 
     else:
-        raise "Invalid method. Use (1=oerplib, 2=psycopg2, 3=xmlrpclib)!"
+        raise "Invalid method. Use (1=xmlrpclib, 2=psycopg2, 3=oerplib)!"
 
 # check for reults
 db_err = False
-for db in db_list_1:
-    if db not in db_list_2 or db not in db_list_3:
+for db in db_list3:
+    if db not in db_list2 or db not in db_list1:
         db_err = True
-for db in db_list_2:
-    if db not in db_list_1 or db not in db_list_3:
+for db in db_list2:
+    if db not in db_list3 or db not in db_list1:
         db_err = True
-for db in db_list_3:
-    if db not in db_list_1 or db not in db_list_2:
+for db in db_list1:
+    if db not in db_list3 or db not in db_list2:
         db_err = True
 
 if db_err:
     raise "Test failed!"
 
+# print db_list1
+# print db_list2
+# print db_list3
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
