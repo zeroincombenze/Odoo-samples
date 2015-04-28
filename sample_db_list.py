@@ -58,19 +58,32 @@ Require Odoo server running         No            Yes               Yes
 """
 
 # import pdb
+import os.path
 import ConfigParser
 
-# pdb.set_trace()
 # Get username and password form /etc/openerp-server.conf
 # This code may not work if db server is not in current host!!
 
-cfg_obj = ConfigParser.SafeConfigParser()
-cfg_obj.read("/etc/openerp-server.conf")
-s = "options"
-db_user = cfg_obj.get(s, "db_user")
-db_passwd = cfg_obj.get(s, "db_password")
-db_host = cfg_obj.get(s, "db_host")
-version = "V1.0.4"
+version = "V1.0.5"
+cfg_fn = "/etc/openerp-server.conf_inv"
+if os.path.isfile(cfg_fn):
+    cfg_obj = ConfigParser.SafeConfigParser()
+    cfg_obj.read(cfg_fn)
+    s = "options"
+    db_user = cfg_obj.get(s, "db_user")
+    db_passwd = cfg_obj.get(s, "db_password")
+    db_host = cfg_obj.get(s, "db_host")
+    db_name = cfg_obj.get(s, "db_name")
+    db_port = cfg_obj.getint(s, "xmlrpc_port")
+else:
+    db_user = None
+    db_passwd = None
+    db_host = "localhost"
+    db_name = "False"
+    db_port = 8069
+
+if db_name == "False":
+    db_name = "postgres"
 
 # Method selection (1=oerplib, 2=psycopg2, 3=xmlrpclib)
 for method in (1, 2, 3):
@@ -78,32 +91,34 @@ for method in (1, 2, 3):
     if method == 1:
         import oerplib
 
-        oerp = oerplib.OERP(server='localhost', protocol='xmlrpc', port=8069)
+        oerp = oerplib.OERP(server=db_host, protocol='xmlrpc', port=db_port)
         db_list_1 = oerp.db.list()
 
     elif method == 2:
         import psycopg2
 
-        db_port = 5432
-        db_name = "demo"
-        db = psycopg2.connect(
-            user=db_user,
-            password=db_passwd,
-            host=db_host,
-            port=db_port,
-            database=db_name)
-        cr = db.cursor()
-        cr.execute("select datname from pg_database"
-                   " where datname not like 'template%'"
-                   "  and datname not like 'postgres%'")
-        dblist = [str(name) for (name,) in cr.fetchall()]
+        if db_user:
+            svr_port = 5432
+            db = psycopg2.connect(
+                user=db_user,
+                password=db_passwd,
+                host=db_host,
+                port=svr_port,
+                database=db_name)
+            cr = db.cursor()
+            cr.execute("select datname from pg_database"
+                       " where datname not like 'template%'"
+                       "  and datname not like 'postgres%'")
+            dblist = [str(name) for (name,) in cr.fetchall()]
+        else:
+            # Not valid! Just for testing
+            dblist = db_list_1
         db_list_2 = dblist
 
     elif method == 3:
         import xmlrpclib
 
-        host = db_host+":8069"
-        db = "postgres"
+        host = db_host+":"+str(db_port)
         db_serv_url = 'http://{0}/xmlrpc/db'.format(host)
         sock = xmlrpclib.ServerProxy(db_serv_url)
         dblist = sock.list()
